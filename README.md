@@ -28,3 +28,43 @@ Apparently this is a standard naming convention for the MCP endpoints:
 | `GET /v1/list_tools` | Enumerate tools      | `{ "tools": [ { …JSON-Schema… } ] }`                    |
 | `POST /v1/call_tool` | Invoke one tool      | `{ "name":"ping", "arguments":{} }`                     |
 
+### Code
+
+See [diff](https://github.com/DavidRagone/SquealBox/commit/82d5308947b7bdd7483246d90b1b4ac81d52b1a4)
+
+### Wait, how does any of this work?
+
+1. Model → tool (“I’d like to run ping.”)
+1. Tool → model (“Here’s { result: "pong" }; now please continue your answer.”)
+
+**But, why would the model try to run a tool?** Because you told it that the tool
+exists (via the `/v1/list_tools` endpoint) and that it can be run (via the
+`/v1/call_tool` endpoint), and the model determined that it should use the tool.
+
+Different providers register these in different ways (and some call them
+different things, e.g. functions instead of tools), but the end result is the
+same - the model becomes aware of the tool, and uses it when necessary.
+
+When the model is deciding what to output, it sees two options:
+
+* Emit plain text (role assistant), or
+* Emit a special message of type tool_call whose JSON matches the schema for ping.
+
+If the user asks _“What is the result of ping?”_, the model notices it can’t
+fabricate the answer itself (the schema promises an authoritative result), so it
+chooses the second path.
+
+Internally, tool-aware models are trained with thousands of examples where they
+see:
+
+> **user →** “What files are in this folder?”
+> **assistant (tool_call) →** { name: "list_files", … }
+> **tool result →** …
+> **assistant →** “Here are the files: …”
+
+That bias makes them pick tool calls whenever they fit.
+
+In this one-tool prototype, the model will only call ping if the
+conversation context makes that look useful (e.g. you ask “please run ping”).
+
+
