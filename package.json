@@ -1,10 +1,13 @@
 {
   "name": "squealbox",
   "version": "1.0.0",
-  "description": "",
+  "description": "A minimal MCP server (2025-06-18)",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "jest",
+    "dev": "ts-node-dev --respawn src/server.ts",
+    "build": "tsc",
+    "start": "node build/server.js"
   },
   "repository": {
     "type": "git",
@@ -23,6 +26,13 @@
   },
   "devDependencies": {
     "@types/express": "^5.0.3",
+    "@types/jest": "^30.0.0",
+    "@types/json-schema": "^7.0.15",
+    "@types/supertest": "^6.0.3",
+    "jest": "^30.0.3",
+    "json-schema": "^0.4.0",
+    "supertest": "^7.1.1",
+    "ts-jest": "^29.4.0",
     "ts-node-dev": "^2.0.0",
     "typescript": "^5.8.3"
   }
